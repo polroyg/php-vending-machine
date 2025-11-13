@@ -1,0 +1,60 @@
+{
+  "name": "Vending Machine Container",
+  "image": "mcr.microsoft.com/devcontainers/php:8.3",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/composer": {
+      "version": "latest"
+    }
+  },
+  "remoteEnv": {
+    "XDEBUG_MODE": "off"
+  },
+  "postCreateCommand": "composer global require squizlabs/php_codesniffer && /home/vscode/.composer/vendor/bin/phpcs --config-set default_standard PSR12 && chmod +x ./src/app.php"
+  ,
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // PHP Lint (sintaxis)
+        "php.validate.enable": true,
+        "php.validate.executablePath": "/usr/local/bin/php",
+
+        // Intelephense (intellisense)
+        "intelephense.diagnostics.enable": true,
+
+        // Formato y estilo
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4,
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+
+        // Integración con PHP_CodeSniffer
+        "phpcs.enable": true,
+        "phpcs.standard": "PSR12",
+        "phpcs.executablePath": "/home/vscode/.composer/vendor/bin/phpcs",
+
+        // Mejor visualización de errores
+        "errorLens.enabled": true
+      },
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug",
+        "mikestead.dotenv",
+        "usernamehw.errorlens",
+        "christian-kohler.path-intellisense",
+        "eamodio.gitlens",
+        "codezombiech.gitignore",
+        "swordev.phpstan",
+        "shevaua.phpcs",
+        "donjayamanne.githistory",
+        "mhutchie.git-graph"
+      ]
+    }
+  },
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    "source=.,target=/workspace,type=bind,consistency=cached",
+    "source=${env:HOME}/.ssh,target=/home/vscode/.ssh,type=bind"
+  ],
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true
+}
