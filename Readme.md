@@ -30,15 +30,17 @@ Modelado de una máquina expendedora, manteniendo el estado durante su ejecució
 │   └── devcontainer.json
 │
 ├── src/
-│   └── App.php
+│   └── app.php
+│   └── VendingMachine.php
 │   │
-│   └── domain/
+│   └── Domain/
+│   │   ├── Coin.php
+│   │   ├── Item.php
+│   │
+│   └── Application/
 │   │   ├── XXX
 │   │
-│   └── application/
-│   │   ├── XXX
-│   │
-│   └── infrastructure/
+│   └── Infrastructure/
 │       ├── XXX
 │
 ├── tests/
