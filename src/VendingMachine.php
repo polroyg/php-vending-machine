@@ -2,7 +2,8 @@
 
 namespace App;
 
-class VendingMachine {
+class VendingMachine
+{
     private array $items = [];
     private array $cash_box = [];
 }

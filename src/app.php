@@ -3,39 +3,37 @@
 
 declare(strict_types=1);
 
-// Desactiva límites de tiempo por si acaso
+require __DIR__ . '/../vendor/autoload.php';
+
+use App\Infrastructure\ConsoleIO;
+
 set_time_limit(0);
+try {
+    print_r("Starting Vending Machine Application..." . PHP_EOL);
+    $consoleIO = new ConsoleIO();
+    print_r("Starting Vending Machine Application..." . PHP_EOL);
 
+    $consoleIO->showMessage("Welcome to Vending Machine Application");
 
-echo "Vending Machine\n";
+    $consoleIO->showMainMenu();
+    $read_input = $consoleIO->readInput();
 
-$continuar = true;
-do {
-    echo "En que puedo ayudarte?\n";
-    echo "1. Comprar producto\n";
-    echo "2. Ver productos\n";
-    echo "3. Gestionar machine\n";
-    echo "0. Salir\n";
+    $num_inputs = count($read_input);
 
-    echo "Selecciona una opción: ";
-    $opcion = intval(fgets(STDIN));
-
-    switch ($opcion) {
-        case 1:
-            echo "Comprar producto\n";
-            break;
-        case 2:
-            echo "Ver productos\n";
-            break;
-        case 3:
-            echo "Gestionar machine\n";
-            break;
-        case 0:
-            $continuar = false;
-            echo "Saliendo...\n";
-            break;
-        default:
-            echo "Opción no válida\n";
-            break;
+    if ($num_inputs === 0) {
+        $consoleIO->showMessage("No action selected. Exiting...");
+        exit(0);
+    } elseif ($num_inputs > 1) {
+        $consoleIO->showMessage("Command inserted: " . implode(", ", $read_input));
+        exit(0);
+    } else {
+        $action = $read_input[0];
+        if (!$consoleIO->validateAction($action)) {
+            $consoleIO->showMessage("Invalid action selected. Exiting...");
+            exit(0);
+        }
     }
-} while ($continuar);
+} catch (\Throwable $th) {
+    //throw $th;
+    print_r("An error has occurred: " . $th->getMessage() . PHP_EOL);
+}
