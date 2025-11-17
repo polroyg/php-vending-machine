@@ -9,7 +9,7 @@
   "remoteEnv": {
     "XDEBUG_MODE": "off"
   },
-  "postCreateCommand": "composer global require squizlabs/php_codesniffer && composer install && /home/vscode/.composer/vendor/bin/phpcs --config-set default_standard PSR12 && chmod +x ./src/app.php",
+  "postCreateCommand": "composer global require squizlabs/php_codesniffer && composer global require phpunit/phpunit && composer install && /home/vscode/.composer/vendor/bin/phpcs --config-set default_standard PSR12 && chmod +x ./src/app.php",
   "customizations": {
     "vscode": {
       "settings": {
@@ -33,6 +33,10 @@
 
         // Mejor visualización de errores
         "errorLens.enabled": true
+        ,
+        // Configuración para PHPUnit
+        "phpunit.phpunitExecutablePath": "/workspace/vendor/bin/phpunit",
+        "phpunit.enable": true
       },
       "extensions": [
         "bmewburn.vscode-intelephense-client",

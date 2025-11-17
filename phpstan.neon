@@ -1,0 +1,14 @@
+includes:
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+parameters:
+    level: max
+    paths:
+        - src
+    autoload_files:
+        - %rootDir%/../../../vendor/autoload.php
+    excludes_analyse:
+        - tests/*
+    checkMissingIterableValueType: true
+    checkGenericClassInNonGenericObjectType: true
+    inferPrivatePropertyTypeFromConstructor: true
