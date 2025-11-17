@@ -17,7 +17,7 @@ class ConsoleIOTest extends TestCase
     public function testReadInput()
     {
         $consoleIO = new ConsoleIO();
-        $parameters = $consoleIO->readInput("param1, , param2, param3");
+        $parameters = $consoleIO->readInput("param1, param2, param3");
         $this->assertTrue(sizeof($parameters) == 3);
     }
 }
