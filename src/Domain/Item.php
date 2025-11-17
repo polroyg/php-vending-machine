@@ -4,21 +4,31 @@ namespace App\Domain;
 
 class Item
 {
+    private string $key;
     private string $name;
     private float $price;
     private int $quantity;
 
-    public function __construct(string $name, float $price, int $quantity)
+    public function __construct(string $key, string $name, float $price, int $quantity)
     {
+        if (empty(trim($key))) {
+            throw new \InvalidArgumentException("Key is required");
+        }
         if ($price <= 0) {
             throw new \InvalidArgumentException("Price must be positive: $price");
         }
         if ($quantity < 0) {
             throw new \InvalidArgumentException("Quantity cannot be negative: $quantity");
         }
+        $this->key = $key;
         $this->name = $name;
         $this->price = $price;
         $this->quantity = $quantity;
+    }
+
+    public function getKey(): string
+    {
+        return $this->key;
     }
 
     public function getName(): string

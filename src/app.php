@@ -9,14 +9,11 @@ use App\Infrastructure\ConsoleIO;
 
 set_time_limit(0);
 try {
-    print_r("Starting Vending Machine Application..." . PHP_EOL);
     $consoleIO = new ConsoleIO();
-    print_r("Starting Vending Machine Application..." . PHP_EOL);
-
     $consoleIO->showMessage("Welcome to Vending Machine Application");
 
     $consoleIO->showMainMenu();
-    $read_input = $consoleIO->readInput();
+    $read_input = $consoleIO->readInput(fgets(STDIN));
 
     $num_inputs = count($read_input);
 
@@ -28,12 +25,33 @@ try {
         exit(0);
     } else {
         $action = $read_input[0];
-        if (!$consoleIO->validateAction($action)) {
-            $consoleIO->showMessage("Invalid action selected. Exiting...");
-            exit(0);
+        $exit = $action === "EXIT";
+        while (!$exit) {
+            if (!$consoleIO->validateAction($action)) {
+                $consoleIO->showMessage("Invalid action selected. Exiting...");
+                exit(0);
+            }
+
+            if ($action === "SERVICE") {
+                processServiceActions($consoleIO);
+            } else {
+                processCustomerActions($consoleIO);
+            }
         }
+        $consoleIO->showMessage("Closing the app...");
     }
 } catch (\Throwable $th) {
     //throw $th;
     print_r("An error has occurred: " . $th->getMessage() . PHP_EOL);
+}
+
+
+function processServiceActions($consoleIO)
+{
+    $consoleIO->showServiceMenu();
+}
+
+function processCustomerActions($consoleIO)
+{
+    $consoleIO->showCustomerMenu()
 }

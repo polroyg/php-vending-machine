@@ -9,8 +9,7 @@
   "remoteEnv": {
     "XDEBUG_MODE": "off"
   },
-  "postCreateCommand": "composer global require squizlabs/php_codesniffer && /home/vscode/.composer/vendor/bin/phpcs --config-set default_standard PSR12 && chmod +x ./src/app.php"
-  ,
+  "postCreateCommand": "composer global require squizlabs/php_codesniffer && composer install && /home/vscode/.composer/vendor/bin/phpcs --config-set default_standard PSR12 && chmod +x ./src/app.php",
   "customizations": {
     "vscode": {
       "settings": {
@@ -46,7 +45,8 @@
         "swordev.phpstan",
         "shevaua.phpcs",
         "donjayamanne.githistory",
-        "mhutchie.git-graph"
+        "mhutchie.git-graph",
+        "recca0120.vscode-phpunit"
       ]
     }
   },
