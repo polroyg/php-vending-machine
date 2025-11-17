@@ -3,28 +3,29 @@
 namespace Tests\Infrastructure\Repositories;
 
 use PHPUnit\Framework\TestCase;
-use App\Infrastructure\Repositories\ItemJsonRepository;
+use App\Infrastructure\Repositories\CashBoxItemRepository;
 use App\Infrastructure\JsonStorage;
-use App\Domain\Item;
+use App\Domain\CashBoxItem;
+use App\Domain\Coin;
 
-class ItemJsonRepositoryTest extends TestCase
+class CashBoxItemJsonRepositoryTest extends TestCase
 {
     private $storageMock;
-    private ItemJsonRepository $repository;
+    private CashBoxItemRepository $repository;
 
     protected function setUp(): void
     {
         $this->storageMock = $this->createMock(JsonStorage::class);
-        $this->repository = new ItemJsonRepository($this->storageMock);
+        $this->repository = new CashBoxItemRepository($this->storageMock);
     }
 
     public function testCreateElement()
     {
         $this->storageMock->method('load')->willReturn([]);
-        $newItem = new Item('3', 'Item3', 15.00, 3);
+        $newItem = new CashBoxItem(new Coin(0.10), 3);
         $this->storageMock->expects($this->once())
             ->method('save')
-            ->with([['key' => '3', 'name' => 'Item3', 'price' => 15.00, 'quantity' => 3]]);
+            ->with([['value' => 0.10, 'quantity' => 3]]);
 
         $this->repository->create($newItem);
     }
@@ -32,11 +33,11 @@ class ItemJsonRepositoryTest extends TestCase
     public function testCreateElementExists()
     {
         $existing = [
-            ['key' => '1', 'name' => 'Item1', 'price' => 10.50, 'quantity' => 2],
+            ['value' => 0.05, 'quantity' => 10],
         ];
         $this->storageMock->method('load')->willReturn($existing);
 
-        $newItem = new Item('1', 'Item1', 15.00, 3);
+        $newItem = new CashBoxItem(new Coin(0.05), 3);
 
         $this->expectException(\RuntimeException::class);
 
@@ -46,37 +47,37 @@ class ItemJsonRepositoryTest extends TestCase
     public function testFindAll()
     {
         $data = [
-            ['key' => '1', 'name' => 'Item1', 'price' => 10.50, 'quantity' => 2],
-            ['key' => '2', 'name' => 'Item2', 'price' => 20.00, 'quantity' => 5],
+            ['value' => 0.05, 'quantity' => 10],
+            ['value' => 0.10, 'quantity' => 5],
         ];
         $this->storageMock->method('load')->willReturn($data);
 
         $items = $this->repository->findAll();
 
         $this->assertCount(2, $items);
-        $this->assertInstanceOf(Item::class, $items[0]);
-        $this->assertEquals('1', $items[0]->getKey());
-        $this->assertEquals('Item2', $items[1]->getName());
+        $this->assertInstanceOf(CashBoxItem::class, $items[0]);
+        $this->assertEquals(0.05, $items[0]->getCoin()->getValue());
+        $this->assertEquals(5, $items[1]->getQuantity());
     }
 
     public function testFindByKey()
     {
         $data = [
-            ['key' => '1', 'name' => 'Item1', 'price' => 10.50, 'quantity' => 2],
+            ['value' => 0.05, 'quantity' => 10],
         ];
         $this->storageMock->method('load')->willReturn($data);
 
-        $item = $this->repository->findByKey('1');
+        $item = $this->repository->findByCoin(new Coin(0.05));
 
-        $this->assertInstanceOf(Item::class, $item);
-        $this->assertEquals('1', $item->getKey());
+        $this->assertInstanceOf(CashBoxItem::class, $item);
+        $this->assertEquals(0.05, $item->getCoin()->getValue());
     }
 
     public function testFindByKeyNotExists()
     {
         $this->storageMock->method('load')->willReturn([]);
 
-        $item = $this->repository->findByKey('2');
+        $item = $this->repository->findByCoin(new Coin(1));
 
         $this->assertNull($item);
     }
@@ -84,34 +85,37 @@ class ItemJsonRepositoryTest extends TestCase
     public function testUpdateSavesUpdatedItem()
     {
         $existing = [
-            ['key' => '1', 'name' => 'Item1', 'price' => 10.50, 'quantity' => 2],
+            ['value' => 0.25, 'quantity' => 10],
         ];
         $this->storageMock->method('load')->willReturn($existing);
 
-        $updatedItem = new Item('1', 'Item1 Modified', 10.50, 5);
-
+        $updatedItem = new CashBoxItem(new Coin(0.25), 5);
         $this->storageMock->expects($this->once())
             ->method('save')
-            ->with([['key' => '1', 'name' => 'Item1 Modified', 'price' => 10.50, 'quantity' => 5]]);
+            ->with([['value' => 0.25, 'quantity' => 5]]);
 
         $this->repository->update($updatedItem);
+        $items = $this->repository->findAll();
+        $this->assertCount(1, $items);
     }
 
-    public function testDeleteRemovesItem()
+    public function testDeleteRemoveItem()
     {
         $existing = [
-            ['key' => 'k1', 'name' => 'Item1', 'price' => 1, 'quantity' => 1],
-            ['key' => 'k2', 'name' => 'Item2', 'price' => 2, 'quantity' => 2],
+            ['value' => 0.25, 'quantity' => 10],
+            ['value' => 0.10, 'quantity' => 5],
         ];
         $this->storageMock->method('load')->willReturn($existing);
-
         $this->storageMock->expects($this->once())
             ->method('save')
             ->with($this->callback(function ($items) {
-            $values = array_values($items);
-            return count($items) === 1 && isset($values[0]['key']) && $values[0]['key'] === 'k2';
+                $values = array_values($items);
+                return count($items) === 1 &&
+                       isset($values[0]['value']) &&
+                       $values[0]['value'] === 0.10 &&
+                       isset($values[0]['quantity']) &&
+                       $values[0]['quantity'] === 5;
             }));
-
-        $this->repository->delete('k1');
+         $this->repository->deleteByCoin(new Coin(0.25));
     }
 }

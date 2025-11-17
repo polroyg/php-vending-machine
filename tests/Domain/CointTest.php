@@ -39,4 +39,18 @@ class CointTest extends TestCase
         }
         $this->assertFalse(false);
     }
+
+    public function testEquals()
+    {
+        $coin = new Coin(0.05, 5);
+        $coin2 = new Coin(0.05, 15);
+        $this->assertTrue($coin->equals($coin2));
+    }
+
+    public function testNotEquals()
+    {
+        $coin = new Coin(0.05, 5);
+        $coin2 = new Coin(0.10, 15);
+        $this->assertFalse($coin->equals($coin2));
+    }
 }

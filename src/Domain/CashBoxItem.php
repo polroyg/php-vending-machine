@@ -30,4 +30,9 @@ class CashBoxItem
     {
         return $this->coin->getValue() * $this->quantity;
     }
+
+    public function equals(CashBoxItem $other): bool
+    {
+        return $this->coin->equals($other->getCoin());
+    }
 }

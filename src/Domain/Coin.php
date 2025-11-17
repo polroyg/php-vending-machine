@@ -24,4 +24,9 @@ class Coin
         $validValues = [0.05, 0.10, 0.25, 1.00];
         return in_array($value, $validValues, true);
     }
+
+    public function equals(Coin $other): bool
+    {
+        return $this->value === $other->getValue();
+    }
 }

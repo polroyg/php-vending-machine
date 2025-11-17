@@ -22,7 +22,7 @@ class ItemJsonRepository
         }
         $items = $this->findAll();
         $items[] = $item;
-        $this->storage->save($items);
+        $this->storage->save($this->mapToArray($items));
     }
 
     public function findAll(): array
@@ -56,7 +56,7 @@ class ItemJsonRepository
             },
             $domainItems
         );
-        $this->storage->save($updatedItems);
+        $this->storage->save($this->mapToArray($updatedItems));
     }
 
     public function delete(string $key): void
@@ -68,7 +68,7 @@ class ItemJsonRepository
         $items = $this->storage->load();
         $domainItems = $this->mapToDomainItems($items);
         $filteredItems = array_filter($domainItems, fn($domainItem) => $domainItem->getKey() !== $key);
-        $this->storage->save(array_values($filteredItems));
+        $this->storage->save($this->mapToArray(array_values($filteredItems)));
     }
 
     private function mapToDomainItems(array $items): array
@@ -79,5 +79,17 @@ class ItemJsonRepository
             $item['price'] ?? 0,
             $item['quantity'] ?? 0
         ), $items);
+    }
+
+    private function mapToArray(array $items): array
+    {
+        return array_map(function (Item $item) {
+            return [
+                'key' => $item->getKey(),
+                'name' => $item->getName(),
+                'price' => $item->getPrice(),
+                'quantity' => $item->getQuantity(),
+            ];
+        }, $items);
     }
 }
