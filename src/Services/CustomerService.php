@@ -7,7 +7,7 @@ use App\Domain\Coin;
 use App\Domain\Item;
 use App\Domain\Transaction;
 use App\Infrastructure\Repositories\ItemJsonRepository;
-use App\Infrastructure\Repositories\CashBoxItemRepository;
+use App\Infrastructure\Repositories\CashBoxItemJsonRepository;
 
 class CustomerService
 {
@@ -15,9 +15,9 @@ class CustomerService
 
     public function __construct(
         ItemJsonRepository $itemRepository,
-        CashBoxItemRepository $cashBoxItemRepository
+        CashBoxItemJsonRepository $CashBoxItemJsonRepository
     ) {
-        $this->vendingMachine = new VendingMachine($itemRepository, $cashBoxItemRepository);
+        $this->vendingMachine = new VendingMachine($itemRepository, $CashBoxItemJsonRepository);
         $this->vendingMachine->startTransaction();
     }
 

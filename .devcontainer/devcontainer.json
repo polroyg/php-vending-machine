@@ -9,7 +9,11 @@
   "remoteEnv": {
     "XDEBUG_MODE": "off"
   },
-  "postCreateCommand": "composer global require squizlabs/php_codesniffer && composer global require phpunit/phpunit && composer install && /home/vscode/.composer/vendor/bin/phpcs --config-set default_standard PSR12 && chmod +x ./src/app.php",
+  "postCreateCommand": {
+    "composer_global": "composer global require squizlabs/php_codesniffer && composer global require phpunit/phpunit",
+    "composer_install": "composer install && /home/vscode/.composer/vendor/bin/phpcs --config-set default_standard PSR12",
+    "chmod_app": "chmod +x ./src/app.php"
+  },
   "customizations": {
     "vscode": {
       "settings": {

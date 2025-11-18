@@ -7,7 +7,7 @@ use App\Domain\Coin;
 use App\Infrastructure\JsonStorage;
 
 //TODO: Crear interficie de repositorios
-class CashBoxItemRepository
+class CashBoxItemJsonRepository
 {
     private JsonStorage $storage;
 

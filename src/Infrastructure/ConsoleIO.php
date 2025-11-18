@@ -18,32 +18,42 @@ class ConsoleIO
 
     public function showMainMenu(): void
     {
-        $this->showMessage("Select an option");
-        $this->showMessage("1. Customer mode");
-        $this->showMessage("2. Service mode");
-        $this->showMessage("0. Exit");
+        $this->showMessage("SELECT ACCESS MODE:");
+        $this->showMessage("------------------");
+        $this->showMessage(" 1. Customer mode");
+        $this->showMessage(" 2. Service mode");
+        $this->showMessage(" 0. Exit");
+        $this->showMessage("");
     }
 
-    public function showCustomerMenu(): void
+    public function getCustomerMenu(): void
     {
-        $this->showMessage("Select an action:");
-        $this->showMessage("1. Insert Coin");
-        $this->showMessage("2. Get Item");
-        $this->showMessage("3. Return Coins");
-        $this->showMessage("4. Service Mode");
-        $this->showMessage("0. Exit");
+        $this->showMessage("SELECT AN OPTION:");
+        $this->showMessage("----------------");
+        $this->showMessage(" 1. Insert Coin");
+        $this->showMessage(" 2. Get Item");
+        $this->showMessage(" 3. Return Coins");
+        $this->showMessage(" 4. View amount inserted");
+        $this->showMessage(" 0. Exit");
+        $this->showMessage("");
     }
     public function showServiceMenu(): void
     {
-        $this->showMessage("Select a service action:");
+        $this->showMessage("SELECT AN OPTION:");
+        $this->showMessage("----------------");
         $this->showMessage("1. Sales report");
         $this->showMessage("2. Add change money");
         $this->showMessage("3. View inventory");
         $this->showMessage("4. Restock");
         $this->showMessage("0. Exit service mode");
+        $this->showMessage("");
     }
     public function showMessage(string $message): void
     {
         print_r($message . PHP_EOL);
+    }
+    public function showMessageInline(string $message): void
+    {
+        print_r($message);
     }
 }
