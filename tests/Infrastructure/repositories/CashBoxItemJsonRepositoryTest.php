@@ -3,7 +3,7 @@
 namespace Tests\Infrastructure\Repositories;
 
 use PHPUnit\Framework\TestCase;
-use App\Infrastructure\Repositories\CashBoxItemRepository;
+use App\Infrastructure\Repositories\CashBoxItemJsonRepository;
 use App\Infrastructure\JsonStorage;
 use App\Domain\CashBoxItem;
 use App\Domain\Coin;
@@ -11,12 +11,12 @@ use App\Domain\Coin;
 class CashBoxItemJsonRepositoryTest extends TestCase
 {
     private $storageMock;
-    private CashBoxItemRepository $repository;
+    private CashBoxItemJsonRepository $repository;
 
     protected function setUp(): void
     {
         $this->storageMock = $this->createMock(JsonStorage::class);
-        $this->repository = new CashBoxItemRepository($this->storageMock);
+        $this->repository = new CashBoxItemJsonRepository($this->storageMock);
     }
 
     public function testCreateElement()

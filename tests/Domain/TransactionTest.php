@@ -8,6 +8,16 @@ use PHPUnit\Framework\TestCase;
 
 class TransactionTest extends TestCase
 {
+
+    public function testCreateEmptyTransaction()
+    {
+        $transaction = new Transaction();
+
+        $this->assertNull($transaction->getItem());
+        $this->assertEquals(0, $transaction->getBalance());
+        $this->assertEquals(0, count($transaction->getCoins()));
+    }
+
     public function testAddCoinsAndValidateBalance()
     {
         try {

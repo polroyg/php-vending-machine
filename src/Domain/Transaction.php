@@ -19,11 +19,9 @@ class Transaction
 
     public function __construct(?array $coins = null, ?Item $item = null)
     {
-        $this->coins = $coins;
+        $this->coins = $coins ?? [];
         $this->item = $item;
-        if (null != $coins) {
-            $this->balance = array_reduce($coins, fn($sum, Coin $coin) => $sum + $coin->getValue(), 0);
-        }
+        $this->balance = array_reduce($this->coins, fn($sum, Coin $coin) => $sum + $coin->getValue(), 0);
     }
 
     public function addCoin(Coin $coin): void
@@ -76,6 +74,13 @@ class Transaction
     public function getInvalidCoins(): array
     {
         return $this->invalidCoins;
+    }
+
+    public function clearCoins(): void
+    {
+        $this->coins = [];
+        $this->invalidCoins = [];
+        $this->balance = 0;
     }
 
     public function isValid(): bool

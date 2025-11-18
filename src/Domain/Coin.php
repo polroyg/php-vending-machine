@@ -5,6 +5,7 @@ namespace App\Domain;
 class Coin
 {
     private float $value;
+    private const VALID_VALUES = [0.02, 0.05, 0.10, 0.25, 0.50, 1.00, 2.00];
 
     public function __construct(float $value)
     {
@@ -26,8 +27,7 @@ class Coin
 
     private function validateValue(float $value): bool
     {
-        $validValues = [0.05, 0.10, 0.25, 1.00];
-        return in_array($value, $validValues, true);
+        return in_array($value, self::VALID_VALUES, true);
     }
 
     public function equals(Coin $other): bool

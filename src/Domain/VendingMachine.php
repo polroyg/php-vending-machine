@@ -3,21 +3,25 @@
 namespace App\Domain;
 
 use App\Infrastructure\Repositories\ItemJsonRepository;
-use App\Infrastructure\Repositories\CashBoxItemRepository;
+use App\Infrastructure\Repositories\CashBoxItemJsonRepository;
 
 class VendingMachine
 {
     private ItemJsonRepository $itemRepository;
-    private CashBoxItemRepository $cashBoxItemRepository;
+    private CashBoxItemJsonRepository $cashBoxItemJsonRepository;
     private CashBox $cashBox;
     private ?Transaction $transaction;
+    private const VALID_COIN_VALUES = [0.05, 0.10, 0.25, 1.00];
 
 
-    public function __construct(ItemJsonRepository $itemRepository, CashBoxItemRepository $cashBoxItemRepository)
-    {
+    public function __construct(
+        ItemJsonRepository $itemRepository,
+        CashBoxItemJsonRepository $cashBoxItemJsonRepository
+    ) {
         $this->itemRepository = $itemRepository;
-        $this->cashBoxItemRepository = $cashBoxItemRepository;
-        $this->cashBox = new CashBox($cashBoxItemRepository->findAll());
+        $this->cashBoxItemJsonRepository = $cashBoxItemJsonRepository;
+        $this->cashBox = new CashBox($cashBoxItemJsonRepository->findAll());
+        $this->transaction = null;
     }
 
     public function startTransaction(): void
@@ -38,6 +42,9 @@ class VendingMachine
 
     public function closeTransaction(): void
     {
+        if ($this->transaction === null) {
+            throw new \Exception("No active transaction to close");
+        }
         $this->transaction = null;
     }
 
@@ -49,6 +56,34 @@ class VendingMachine
             $this->transaction->addInvalidCoin($coin);
             throw new \Exception("Invalid coin value: " . $coin->getValue());
             //TODO: crear una excepción para capturar y mostrar mensaje
+        }
+    }
+
+
+
+    public function refundTransaction(): array
+    {
+        if ($this->transaction === null) {
+            throw new \Exception("No active transaction to refund");
+        }
+        $coins_return = array_merge($this->transaction->getCoins(), $this->transaction->getInvalidCoins());
+        $this->transaction->clearCoins();
+        return $coins_return;
+    }
+
+    public function rollbackTransaction(): void
+    {
+        if ($this->transaction !== null) {
+            $item = $this->transaction->getItem();
+            if ($item !== null) {
+                $item->increaseQuantity($this->transaction->getQuantity());
+                $this->itemRepository->update($item);
+            }
+
+            if ($this->transaction->getCoins() !== null) {
+                $this->cashBox->takeCoins($this->transaction->getCoins());
+                $this->cashBoxItemJsonRepository->updateAll($this->cashBox->getItems());
+            }
         }
     }
 
@@ -79,7 +114,7 @@ class VendingMachine
             $this->transaction->setReturnCoins($changeCoins);
 
             $this->itemRepository->update($item);
-            $this->cashBoxItemRepository->updateAll($this->cashBox->getItems());
+            $this->cashBoxItemJsonRepository->updateAll($this->cashBox->getItems());
             return ['item' => $item, 'change' => array_merge($changeCoins, $this->transaction->getInvalidCoins())];
         } catch (\Throwable $th) {
             $this->rollbackTransaction();
@@ -87,31 +122,19 @@ class VendingMachine
         }
     }
 
-    public function refundTransaction(): array
+    public function getAvailableItems(): array
     {
-        return [$this->transaction->getCoins() , $this->transaction->getInvalidCoins()];
+        return $this->itemRepository->findAll();
     }
 
-    public function rollbackTransaction(): void
+    public function getAcceptedCoins(): array
     {
-        if ($this->transaction !== null) {
-            $item = $this->transaction->getItem();
-            if ($item !== null) {
-                $item->increaseQuantity($this->transaction->getQuantity());
-                $this->itemRepository->update($item);
-            }
-
-            if ($this->transaction->getCoins() !== null) {
-                $this->cashBox->takeCoins($this->transaction->getCoins());
-                $this->cashBoxItemRepository->updateAll($this->cashBox->getItems());
-            }
-        }
+        return self::VALID_COIN_VALUES;
     }
-
 
     private function isCoinAccepted(Coin $coin): bool
     {
-        $validValues = [0.05, 0.10, 0.25, 1.00];
-        return in_array($coin->getValue(), $validValues);
+        //TODO: Debería validarse con una lista de monedas aceptadas
+        return in_array($coin->getValue(), $this::VALID_COIN_VALUES);
     }
 }
