@@ -7,9 +7,16 @@ class Transaction
     /** var Coin[] */
     private array $coins = [];
     /** var Coin[] */
-    private array $noAcceptedCoins = [];
+    private array $invalidCoins = [];
+
+    private array $returnCoins = [];
+
     private ?Item $item;
+    private int $quantity = 1;
     private float $balance = 0;
+
+
+
     public function __construct(?array $coins = null, ?Item $item = null)
     {
         $this->coins = $coins;
@@ -25,14 +32,25 @@ class Transaction
         $this->balance += $coin->getValue();
     }
 
-    public function addInvalidCoinValue(Coin $coin): void
+    public function addInvalidCoin(Coin $coin): void
     {
-        $this->noAcceptedCoins[] = $coin;
+        $this->invalidCoins[] = $coin;
     }
 
-    public function setItem($item): void
+    public function getItem(): ?Item
+    {
+        return $this->item;
+    }
+
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
+
+    public function setItem($item, int $quantity = 1): void
     {
         $this->item = $item;
+        $this->quantity = $quantity;
     }
 
     public function getBalance(): float
@@ -43,6 +61,21 @@ class Transaction
     public function refund(): array
     {
         return $this->coins;
+    }
+
+    public function setReturnCoins(array $coins): void
+    {
+        $this->returnCoins = $coins;
+    }
+
+    public function getCoins(): array
+    {
+        return $this->coins;
+    }
+
+    public function getInvalidCoins(): array
+    {
+        return $this->invalidCoins;
     }
 
     public function isValid(): bool

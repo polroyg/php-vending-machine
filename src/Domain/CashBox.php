@@ -42,13 +42,46 @@ class CashBox
         }
     }
 
-    public function calculateChange(float $amount): ?array
+    public function addCoins(array $coins): void
     {
+        foreach ($coins as $coin) {
+            $this->addCoin($coin);
+        }
+    }
+
+    public function takeCoins(array $coins): void
+    {
+        foreach ($coins as $coin) {
+            $this->takeCoin($coin);
+        }
+    }
+
+    public function calculateChange(float $amount): array
+    {
+        if ($amount <= 0) {
+            return [];
+        }
         usort($this->cashBoxItems, function (CashBoxItem $a, CashBoxItem $b) {
             return $b->getCoin()->getValue() <=> $a->getCoin()->getValue();
         });
         $returnCoins = $this->calculateReturnCoins($amount * 100, $this->cashBoxItems);
+
+        if ($amount < 0 && $returnCoins === null) {
+            throw new \Exception("Not enough change available");
+        }
         return $returnCoins;
+    }
+
+    public function takeChange(float $amount): array
+    {
+        if ($amount <= 0) {
+            return [];
+        }
+        $changeCoins = $this->calculateChange($amount);
+        foreach ($changeCoins as $coin) {
+            $this->takeCoin($coin);
+        }
+        return $changeCoins;
     }
 
     public function checkChangeAvailable(float $amount, array $addedCoins): bool
@@ -69,6 +102,11 @@ class CashBox
             $total += $item->getTotalAmount();
         }
         return $total;
+    }
+
+    public function getItems(): array
+    {
+        return $this->cashBoxItems;
     }
 
     private function calculateReturnCoins(

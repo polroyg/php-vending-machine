@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repositories;
 use App\Domain\Item;
 use App\Infrastructure\JsonStorage;
 
+//TODO: Crear interficie de repositorios
 class ItemJsonRepository
 {
     private JsonStorage $storage;

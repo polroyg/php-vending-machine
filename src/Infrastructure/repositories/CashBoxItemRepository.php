@@ -6,6 +6,7 @@ use App\Domain\CashBoxItem;
 use App\Domain\Coin;
 use App\Infrastructure\JsonStorage;
 
+//TODO: Crear interficie de repositorios
 class CashBoxItemRepository
 {
     private JsonStorage $storage;
@@ -58,6 +59,11 @@ class CashBoxItemRepository
             $domainItems
         );
         $this->storage->save($this->mapToArray($updatedItems));
+    }
+
+    public function updateAll(array $items): void
+    {
+        $this->storage->save($this->mapToArray($items));
     }
 
     public function deleteByCoin(Coin $coin): void

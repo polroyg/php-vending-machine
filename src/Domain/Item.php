@@ -69,4 +69,20 @@ class Item
         }
         $this->quantity -= $amount;
     }
+
+    public function increaseQuantity(int $amount): void
+    {
+        if ($amount < 0) {
+            throw new \InvalidArgumentException("Amount to increase cannot be negative: $amount");
+        }
+        $this->quantity += $amount;
+    }
+
+    public function decreaseQuantity(int $amount = 1): void
+    {
+        if ($amount < 0 || $amount > $this->quantity) {
+            throw new \InvalidArgumentException("Amount to decrease is not valid: $amount / {$this->quantity}");
+        }
+        $this->quantity -= $amount;
+    }
 }
