@@ -26,7 +26,26 @@ class CashBoxItem
         return $this->quantity;
     }
 
-    public function totalImport(): float
+    public function increaseQuantity(int $amount = 1): void
+    {
+        if ($amount < 0) {
+            throw new \InvalidArgumentException("Invalid amount value: $amount");
+        }
+        $this->quantity += $amount;
+    }
+
+    public function decreaseQuantity(int $amount = 1): void
+    {
+        if ($amount < 0) {
+            throw new \InvalidArgumentException("Invalid amount value: $amount");
+        }
+        if ($this->quantity - $amount < 0) {
+            throw new \InvalidArgumentException("Quantity cannot be negative");
+        }
+        $this->quantity -= $amount;
+    }
+
+    public function getTotalAmount(): float
     {
         return $this->coin->getValue() * $this->quantity;
     }

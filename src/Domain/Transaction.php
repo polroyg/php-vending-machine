@@ -6,7 +6,7 @@ class Transaction
 {
     /** var Coin[] */
     private array $coins = [];
-    /** var float[] */
+    /** var Coin[] */
     private array $noAcceptedCoins = [];
     private ?Item $item;
     private float $balance = 0;
@@ -25,9 +25,9 @@ class Transaction
         $this->balance += $coin->getValue();
     }
 
-    public function addInvalidCoinValue(float $value): void
+    public function addInvalidCoinValue(Coin $coin): void
     {
-        $this->noAcceptedCoins[] = $value;
+        $this->noAcceptedCoins[] = $coin;
     }
 
     public function setItem($item): void

@@ -19,6 +19,11 @@ class Coin
         return $this->value;
     }
 
+    public function toIntegerAmount(): int
+    {
+        return (int)round($this->value * 100);
+    }
+
     private function validateValue(float $value): bool
     {
         $validValues = [0.05, 0.10, 0.25, 1.00];
