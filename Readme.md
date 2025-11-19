@@ -80,8 +80,6 @@ Modelado de una máquina expendedora, manteniendo el estado durante su ejecució
 ├── composer.json
 ├── phpstan.neon
 ├── phpunit.xml
-├── challenge-sbe.md
-├── README.md
 └── Readme.md
 ```
 
