@@ -73,8 +73,8 @@ class VendorMachineTest extends TestCase
         $this->vendingMachine->startTransaction();
         $coin = new Coin(0.25);
         $this->vendingMachine->addCoinToTransaction($coin);
-        $transaction = $this->vendingMachine->getCurrentTransaction();
-        $this->assertEquals(0.25, $transaction->getBalance());
+        $transactionBalance = $this->vendingMachine->getCurrentTranssactionBalance();
+        $this->assertEquals(0.25, $transactionBalance);
     }
 
     public function testAddInvalidCoinAndRefundToTransaction(): void

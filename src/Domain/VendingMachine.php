@@ -34,10 +34,15 @@ class VendingMachine
 
     public function getCurrentTransaction(): ?Transaction
     {
+        return $this->transaction;
+    }
+
+    public function getCurrentTranssactionBalance(): float
+    {
         if ($this->transaction === null) {
             throw new \Exception("No active transaction");
         }
-        return $this->transaction;
+        return $this->transaction->getBalance();
     }
 
     public function closeTransaction(): void
@@ -58,8 +63,6 @@ class VendingMachine
             //TODO: crear una excepción para capturar y mostrar mensaje
         }
     }
-
-
 
     public function refundTransaction(): array
     {
@@ -125,6 +128,24 @@ class VendingMachine
     public function getAvailableItems(): array
     {
         return $this->itemRepository->findAll();
+    }
+
+    public function restockItem(string $itemKey, int $quantity): void
+    {
+        $item = $this->itemRepository->findByKey($itemKey);
+        if ($item) {
+            $item->increaseQuantity($quantity);
+            $this->itemRepository->update($item);
+        } else {
+            throw new \Exception("Item not found: " . $itemKey);
+        }
+    }
+
+    public function getCashBoxStatus(): array
+    {
+        $coins = $this->cashBox->getItems();
+        $balance = $this->cashBox->getTotalAmount();
+        return ['coins' => $coins, 'balance' => $balance];
     }
 
     public function getAcceptedCoins(): array
