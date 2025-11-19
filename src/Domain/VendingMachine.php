@@ -90,7 +90,7 @@ class VendingMachine
         }
     }
 
-    public function buyItem(string $itemKey, int $quantity = 1): array
+    public function buyItem(string $itemKey, int $quantity = 1): Item
     {
         try {
             $item = $this->itemRepository->findByKey($itemKey);
@@ -115,13 +115,9 @@ class VendingMachine
             $changeAmount = $this->transaction->getBalance() - ($item->getPrice() * $quantity);
             $changeCoins = $this->cashBox->takeChange($changeAmount);
             $this->transaction->setCoins($changeCoins);
-
-            $this->itemRepository->update($item);
+            $this->itemRepository->update($item); //Actualizar repositorio
             $this->cashBoxItemJsonRepository->updateAll($this->cashBox->getItems());
-
-            //TODO: revisar si devolver también las o separar en dos procesos, por si quiere más cosas
-            //TODO: OJO!! Si devolvemos las monedas, eliminar de la transacción las monedas devueltas
-            return ['item' => $item, 'change' => array_merge($changeCoins, $this->transaction->getInvalidCoins())];
+            return $item;
         } catch (\Throwable $th) {
             $this->rollbackTransaction();
             throw $th;

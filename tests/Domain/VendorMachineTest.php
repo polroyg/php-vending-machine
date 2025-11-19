@@ -94,9 +94,8 @@ class VendorMachineTest extends TestCase
         $this->vendingMachine->startTransaction();
         $this->vendingMachine->addCoinToTransaction(new Coin(1.00));
         $result = $this->vendingMachine->buyItem("JUICE", 1);
-        $this->assertArrayHasKey('item', $result);
-        $this->assertEquals("JUICE", $result['item']->getKey());
-        $this->assertCount(0, $result['change']);
+        $this->assertInstanceOf(Item::class, $result);
+        $this->assertEquals("JUICE", $result->getKey());
     }
 
     public function testBuyItemWithChange(): void
@@ -106,10 +105,11 @@ class VendorMachineTest extends TestCase
         $this->vendingMachine->addCoinToTransaction(new Coin(0.25));
         $this->vendingMachine->addCoinToTransaction(new Coin(0.25));
         $result = $this->vendingMachine->buyItem("JUICE", 1);
-        $this->assertArrayHasKey('item', $result);
-        $this->assertEquals("JUICE", $result['item']->getKey());
-        $this->assertCount(2, $result['change']);
-        $this->assertEquals(0.50, array_reduce($result['change'], fn($sum, $coin) => $sum + $coin->getValue(), 0));
+        $this->assertInstanceOf(Item::class, $result);
+        $this->assertEquals("JUICE", $result->getKey());
+        $change = $this->vendingMachine->refundTransaction();
+        $this->assertCount(2, $change);
+        $this->assertEquals(0.50, array_reduce($change, fn($sum, $coin) => $sum + $coin->getValue(), 0));
     }
 
     public function testBuyItemWithInsufficientFunds(): void

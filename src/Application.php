@@ -160,13 +160,7 @@ class Application
         $itemKey = trim(fgets(STDIN));
         try {
             $result = $this->vendingMachine->buyItem($itemKey);
-            if (isset($result['item'])) {
-                $this->consoleIO->showMessage("Dispensed item: " . $itemKey);
-            }
-            if (isset($result['change']) && count($result['change']) > 0) {
-                $coins_str = array_map(fn($coin) => number_format($coin->getValue(), 2), $result['change']);
-                $this->consoleIO->showMessage("Returned change: " . implode(", ", $coins_str));
-            }
+            $this->consoleIO->showMessage("Dispensed item: " . $result->getKey());
         } catch (\Exception $e) {
             $this->consoleIO->showMessage("Error: " . $e->getMessage());
         }
