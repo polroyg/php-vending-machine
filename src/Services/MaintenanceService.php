@@ -3,9 +3,6 @@
 namespace App\Services;
 
 use App\Domain\VendingMachine;
-use App\Domain\Coin;
-use App\Domain\Item;
-use App\Domain\Transaction;
 use App\Infrastructure\Repositories\ItemJsonRepository;
 use App\Infrastructure\Repositories\CashBoxItemJsonRepository;
 
