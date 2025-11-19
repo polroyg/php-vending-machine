@@ -13,7 +13,6 @@ use App\Domain\Coin;
 
 set_time_limit(0);
 try {
-    // Recuperar los argumentos que vienen de consola (excluyendo el nombre del script)
     $params = parseParams($_SERVER['argv']);
     $action = array_pop($params);
 
@@ -22,53 +21,16 @@ try {
     $vendingMachine = initMachine();
 
     if ($action === "SERVICE") {
-        if (!isset($params[0]) || $params[0] === "COINS") {
-            $cashbox_info = $vendingMachine->getCashBoxStatus();
-            foreach ($cashbox_info['coins'] as $coin) {
-                echo  "Coin: " . number_format($coin->getCoin()->getValue(), 2) .
-                    " - Quantity: " . $coin->getQuantity() . "\t";
-            }
+        if (count($params) === 0) {
+            $params = ["ITEMS", "COINS"];
         }
-        if (!isset($params[0]) || $params[0] === "ITEMS") {
-            if (!isset($params[0])) {
-                echo "\n";
-            }
-            $items = $vendingMachine->getAvailableItems();
-            foreach ($items as $item) {
-                echo   $item->getKey() . " => " .
-                    $item->getName() . " (" .
-                    number_format($item->getPrice(), 2) . ") - " .
-                    $item->getQuantity() . "\t";
-            }
-        }
-
-        echo "\n";
+        handleServiceCommand($vendingMachine, $params);
     } else {
-        //Logica de cliente
-        echo " -> ";
-        $vendingMachine->startTransaction();
-        $coins = $params;
-        foreach ($coins as $coinValue) {
-            $vendingMachine->addCoinToTransaction(new Coin((float)$coinValue));
-        }
-        if (str_starts_with($action, 'GET-')) {
-            $itemCode = substr($action, 4);
-            $result = $vendingMachine->buyItem($itemCode);
-            echo " " . $result['item']->getName();
-            if (count($result['change']) > 0) {
-                $changeCoinValues = array_map(fn($coin) => number_format($coin->getValue(), 2), $result['change']);
-                echo " " . implode(", ", $changeCoinValues) . PHP_EOL;
-            }
-        } else if ($action === "RETURN-COIN") {
-            $returnedCoins = $vendingMachine->refundTransaction();
-            $returnedCoinValues = array_map(fn($coin) => number_format($coin->getValue(), 2), $returnedCoins);
-            echo " " . implode(", ", $returnedCoinValues) . PHP_EOL;
-        }
-        $vendingMachine->closeTransaction();
+        handleCustomerCommand($vendingMachine, $action, $params);
     }
 } catch (\Throwable $th) {
     //throw $th;
-    print_r("An error has occurred: " . $th->getMessage() . PHP_EOL);
+    echo ("An error has occurred: " . $th->getMessage() . PHP_EOL);
 }
 
 
@@ -123,4 +85,72 @@ function initMachine(): VendingMachine
         $itemRepository,
         $cashBoxItemRepository
     );
+}
+
+
+function handleServiceCommand(VendingMachine $vendingMachine, array $params): void
+{
+    foreach ($params as $param) {
+        if ($param === "COINS") {
+            printCashStatusService($vendingMachine);
+        } elseif ($param === "ITEMS") {
+            printItemsStatusService($vendingMachine);
+        }
+        echo "\n";
+    }
+}
+
+function printCashStatusService(VendingMachine $vendingMachine): void
+{
+    $cashbox_info = $vendingMachine->getCashBoxStatus();
+    foreach ($cashbox_info['coins'] as $coin) {
+        echo  "Coin: " . number_format($coin->getCoin()->getValue(), 2) .
+            " - Quantity: " . $coin->getQuantity() . "\t";
+    }
+}
+
+function printItemsStatusService(VendingMachine $vendingMachine): void
+{
+    $items = $vendingMachine->getAvailableItems();
+    foreach ($items as $item) {
+        echo   $item->getKey() . " => " .
+            $item->getName() . " (" .
+            number_format($item->getPrice(), 2) . ") - " .
+            $item->getQuantity() . "\t";
+    }
+}
+
+
+function handleCustomerCommand(VendingMachine $vendingMachine, string $action, array $coins): void
+{
+    //Logica de cliente
+    $vendingMachine->startTransaction();
+    echo " -> ";
+    foreach ($coins as $coinValue) {
+        $vendingMachine->addCoinToTransaction(new Coin((float)$coinValue));
+    }
+    if (str_starts_with($action, 'GET-')) {
+        $itemCode = str_replace('GET-', '', $action);
+        handleBuyItem($vendingMachine, $itemCode);
+    } else if ($action === "RETURN-COIN") {
+        handleReturnCoin($vendingMachine);
+    }
+    $vendingMachine->closeTransaction();
+}
+
+function handleBuyItem(VendingMachine $vendingMachine, string $itemCode): void
+{
+    $result = $vendingMachine->buyItem($itemCode);
+    echo " " . $result['item']->getName();
+    if (count($result['change']) > 0) {
+        $changeCoinValues = array_map(fn($coin) => number_format($coin->getValue(), 2), $result['change']);
+        echo " " . implode(", ", $changeCoinValues) . PHP_EOL;
+    }
+}
+
+function handleReturnCoin(VendingMachine $vendingMachine): void
+{
+    $returnedCoins = $vendingMachine->refundTransaction();
+    $returnedCoinValues = array_map(fn($coin) => number_format($coin->getValue(), 2), $returnedCoins);
+    echo " " . implode(", ", $returnedCoinValues) . PHP_EOL;
 }
