@@ -9,8 +9,6 @@ class Transaction
     /** var Coin[] */
     private array $invalidCoins = [];
 
-    private array $returnCoins = [];
-
     private ?Item $item;
     private int $quantity = 1;
     private float $balance = 0;
@@ -21,7 +19,7 @@ class Transaction
     {
         $this->coins = $coins ?? [];
         $this->item = $item;
-        $this->balance = array_reduce($this->coins, fn($sum, Coin $coin) => $sum + $coin->getValue(), 0);
+        $this->balance = $this->calculateBalance();
     }
 
     public function addCoin(Coin $coin): void
@@ -61,14 +59,19 @@ class Transaction
         return $this->coins;
     }
 
-    public function setReturnCoins(array $coins): void
-    {
-        $this->returnCoins = $coins;
-    }
-
     public function getCoins(): array
     {
         return $this->coins;
+    }
+    public function setCoins(array $coins): void
+    {
+        $this->coins = $coins;
+        $this->balance = $this->calculateBalance();
+    }
+
+    private function calculateBalance(): float
+    {
+        return array_reduce($this->coins, fn($sum, Coin $coin) => $sum + $coin->getValue(), 0);
     }
 
     public function getInvalidCoins(): array

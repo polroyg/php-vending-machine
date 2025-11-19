@@ -114,10 +114,13 @@ class VendingMachine
 
             $changeAmount = $this->transaction->getBalance() - ($item->getPrice() * $quantity);
             $changeCoins = $this->cashBox->takeChange($changeAmount);
-            $this->transaction->setReturnCoins($changeCoins);
+            $this->transaction->setCoins($changeCoins);
 
             $this->itemRepository->update($item);
             $this->cashBoxItemJsonRepository->updateAll($this->cashBox->getItems());
+
+            //TODO: revisar si devolver también las o separar en dos procesos, por si quiere más cosas
+            //TODO: OJO!! Si devolvemos las monedas, eliminar de la transacción las monedas devueltas
             return ['item' => $item, 'change' => array_merge($changeCoins, $this->transaction->getInvalidCoins())];
         } catch (\Throwable $th) {
             $this->rollbackTransaction();
