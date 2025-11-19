@@ -57,12 +57,42 @@ class Application
         return $action;
     }
 
-    private function processServiceActions(): void
+    private function getNextServiceAction(): int
     {
+        $this->consoleIO->showMessage("*****************\n");
         $this->consoleIO->showServiceMenu();
+        $this->consoleIO->showMessageInline("Enter your choice: ");
+        $action = (int)fgets(STDIN);
+        $this->consoleIO->showMessage("");
+        return $action;
     }
 
-    private function getNextAction(): int
+    private function processServiceActions(): void
+    {
+        do {
+            $action = $this->getNextServiceAction();
+            switch ($action) {
+                case 1:
+                    $this->handleAvailableItems();
+                    break;
+                case 2:
+                    $this->handleAvailableChange();
+                    break;
+                case 3:
+                    try {
+                        $this->showCurrentBalance();
+                    } catch (\Exception $e) {
+                        $this->consoleIO->showMessage("* No active transaction *");
+                    }
+                    break;
+                default:
+                    $this->consoleIO->showMessage("Invalid option. Please try again.");
+                    break;
+            }
+        } while ($action !== 0);
+    }
+
+    private function getNextCustomerAction(): int
     {
         $this->consoleIO->showMessage("*****************\n");
         $this->consoleIO->getCustomerMenu();
@@ -78,7 +108,7 @@ class Application
             $this->vendingMachine->startTransaction();
         }
         do {
-            $action = $this->getNextAction();
+            $action = $this->getNextCustomerAction();
             switch ($action) {
                 case 1:
                     $this->handleInsertCoin();
@@ -95,10 +125,11 @@ class Application
                 case 5:
                     $this->handleCloseCurrentTransaction();
                     break;
+                default:
+                    $this->consoleIO->showMessage("Invalid option. Please try again.");
+                    break;
             }
         } while ($action != 0);
-
-        $this->vendingMachine->closeTransaction();
     }
 
     private function handleInsertCoin(): void
@@ -152,6 +183,44 @@ class Application
         }
     }
 
+
+    private function handleAvailableItems(): void
+    {
+        try {
+            $products_list = $this->vendingMachine->getAvailableItems();
+            $this->consoleIO->showMessage("** Available items **");
+            foreach ($products_list as $item) {
+                $this->consoleIO->showMessage(
+                    $item->getKey() . " => " .
+                        $item->getName() . " (" .
+                        number_format($item->getPrice(), 2) . ") - " .
+                        $item->getQuantity()
+                );
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->consoleIO->showMessage("Error: " . $e->getMessage());
+        } catch (\Exception $e) {
+            $this->consoleIO->showMessage("Error: " . $e->getMessage());
+        }
+    }
+
+    private function handleAvailableChange(): void
+    {
+        try {
+            $cashbox_info = $this->vendingMachine->getCashBoxStatus();
+            $this->consoleIO->showMessage("** Available coins **");
+            foreach ($cashbox_info['coins'] as $coin) {
+                $this->consoleIO->showMessage(
+                    "Coin: " . number_format($coin->getCoin()->getValue(), 2) .
+                        " - Quantity: " . $coin->getQuantity()
+                );
+            }
+            $this->consoleIO->showMessage("Total amount in cashbox: " . number_format($cashbox_info['balance'], 2));
+        } catch (\Exception $e) {
+            $this->consoleIO->showMessage("Error: " . $e->getMessage());
+        }
+    }
+
     private function showCurrentBalance(): void
     {
         $current_balance = $this->vendingMachine->getCurrentTranssactionBalance();
@@ -184,6 +253,13 @@ class Application
             $this->cashBoxItemRepository->create(new \App\Domain\CashBoxItem(new \App\Domain\Coin(0.10), 15));
             $this->cashBoxItemRepository->create(new \App\Domain\CashBoxItem(new \App\Domain\Coin(0.25), 10));
             $this->cashBoxItemRepository->create(new \App\Domain\CashBoxItem(new \App\Domain\Coin(1.00), 5));
+        }
+    }
+
+    public function __destruct()
+    {
+        if ($this->vendingMachine->getCurrentTransaction() !== null) {
+            $this->handleCloseCurrentTransaction();
         }
     }
 }

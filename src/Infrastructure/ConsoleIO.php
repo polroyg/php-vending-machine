@@ -34,6 +34,7 @@ class ConsoleIO
         $this->showMessage(" 2. Get Item");
         $this->showMessage(" 3. Return Coins");
         $this->showMessage(" 4. View amount inserted");
+        $this->showMessage(" 5. Close current session (return coins)");
         $this->showMessage(" 0. Exit");
         $this->showMessage("");
     }
@@ -41,10 +42,9 @@ class ConsoleIO
     {
         $this->showMessage("SELECT AN OPTION:");
         $this->showMessage("----------------");
-        $this->showMessage("1. Sales report");
-        $this->showMessage("2. Add change money");
-        $this->showMessage("3. View inventory");
-        $this->showMessage("4. Restock");
+        $this->showMessage("1. View available items");
+        $this->showMessage("2. View available change");
+        $this->showMessage("3. Get current transaction money");
         $this->showMessage("0. Exit service mode");
         $this->showMessage("");
     }

@@ -35,7 +35,12 @@ class ItemJsonRepository
     public function findByKey(string $key): ?Item
     {
         $domainItems = $this->findAll();
-        return array_values(array_filter($domainItems, fn($item) => $item->getKey() === $key))[0] ?? null;
+        return array_values(
+            array_filter(
+                $domainItems,
+                fn($item) => strtoupper($item->getKey()) === strtoupper($key)
+            )
+        )[0] ?? null;
     }
 
     public function update(Item $item): void
