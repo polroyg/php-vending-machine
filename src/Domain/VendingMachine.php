@@ -90,7 +90,7 @@ class VendingMachine
         }
     }
 
-    public function buyItem(string $itemKey, int $quantity = 1): Item
+    public function buyItem(string $itemKey, int $quantity = 1): array
     {
         try {
             $item = $this->itemRepository->findByKey($itemKey);
@@ -104,6 +104,7 @@ class VendingMachine
                 $item->getPrice() * $quantity,
                 $this->transaction->getCoins()
             );
+
             if (!$checkChange) {
                 throw new \Exception("Not enough change available for item: " . $itemKey);
             }
@@ -117,7 +118,7 @@ class VendingMachine
             $this->transaction->setCoins($changeCoins);
             $this->itemRepository->update($item); //Actualizar repositorio
             $this->cashBoxItemJsonRepository->updateAll($this->cashBox->getItems());
-            return $item;
+            return ['item' => $item, 'change' => $this->refundTransaction()];
         } catch (\Throwable $th) {
             $this->rollbackTransaction();
             throw $th;

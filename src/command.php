@@ -53,12 +53,17 @@ try {
         }
         if (str_starts_with($action, 'GET-')) {
             $itemCode = substr($action, 4);
-            $item = $vendingMachine->buyItem($itemCode);
-            echo " " . $item->getName();
+            $result = $vendingMachine->buyItem($itemCode);
+            echo " " . $result['item']->getName();
+            if (count($result['change']) > 0) {
+                $changeCoinValues = array_map(fn($coin) => number_format($coin->getValue(), 2), $result['change']);
+                echo " " . implode(", ", $changeCoinValues) . PHP_EOL;
+            }
+        } else if ($action === "RETURN-COIN") {
+            $returnedCoins = $vendingMachine->refundTransaction();
+            $returnedCoinValues = array_map(fn($coin) => number_format($coin->getValue(), 2), $returnedCoins);
+            echo " " . implode(", ", $returnedCoinValues) . PHP_EOL;
         }
-        $returnedCoins = $vendingMachine->refundTransaction();
-        $returnedCoinValues = array_map(fn($coin) => number_format($coin->getValue(), 2), $returnedCoins);
-        echo " " . implode(", ", $returnedCoinValues) . PHP_EOL;
         $vendingMachine->closeTransaction();
     }
 } catch (\Throwable $th) {

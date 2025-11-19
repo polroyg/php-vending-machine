@@ -64,7 +64,8 @@ class CashBox
         usort($this->cashBoxItems, function (CashBoxItem $a, CashBoxItem $b) {
             return $b->getCoin()->getValue() <=> $a->getCoin()->getValue();
         });
-        $returnCoins = $this->calculateReturnCoins($amount * 100, $this->cashBoxItems);
+        $cashBoxItemsShadow = array_map(fn($item) => clone $item, $this->cashBoxItems);
+        $returnCoins = $this->calculateReturnCoins($amount * 100, $cashBoxItemsShadow);
 
         if ($amount < 0 && $returnCoins === null) {
             throw new \Exception("Not enough change available");
@@ -86,7 +87,7 @@ class CashBox
 
     public function checkChangeAvailable(float $amount, array $addedCoins): bool
     {
-        $cashBoxItemsShadow = unserialize(serialize($this->cashBoxItems));
+        $cashBoxItemsShadow = array_map(fn($item) => clone $item, $this->cashBoxItems);
         $availableCashBoxItems = $this->addCoinsHelper($addedCoins, $cashBoxItemsShadow);
         usort($availableCashBoxItems, function (CashBoxItem $a, CashBoxItem $b) {
             return $b->getCoin()->getValue() <=> $a->getCoin()->getValue();
@@ -124,8 +125,9 @@ class CashBox
 
         foreach ($cashBoxItems as $cashBoxItem) {
             if ($cashBoxItem->getQuantity() > 0) {
+                // Simulate taking a coin by decreasing quantity
                 $cashBoxItem->decreaseQuantity();
-                $currentReturnCoins = unserialize(serialize($returnCoins));
+                $currentReturnCoins = $returnCoins;
                 $currentReturnCoins[] = $cashBoxItem->getCoin();
                 $result = $this->calculateReturnCoins(
                     $amount - $cashBoxItem->getCoin()->toIntegerAmount(),
@@ -133,6 +135,8 @@ class CashBox
                     $currentReturnCoins,
                     $depth + 1
                 );
+                // Restore quantity after simulation
+                $cashBoxItem->increaseQuantity();
                 if ($result !== null) {
                     return $result;
                 }
@@ -140,8 +144,6 @@ class CashBox
                 if (!$this->hasCoins($cashBoxItems)) {
                     break;
                 }
-
-                $cashBoxItem->increaseQuantity();
             }
         }
         return null;
@@ -174,5 +176,15 @@ class CashBox
             }
         }
         return $cashBoxItems;
+    }
+
+    //clone method
+    public function __clone()
+    {
+        $clonedCashBoxItems = [];
+        foreach ($this->cashBoxItems as $item) {
+            $clonedCashBoxItems[] = clone $item;
+        }
+        $this->cashBoxItems = $clonedCashBoxItems;
     }
 }

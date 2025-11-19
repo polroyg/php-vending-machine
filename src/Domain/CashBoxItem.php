@@ -54,4 +54,9 @@ class CashBoxItem
     {
         return $this->coin->equals($other->getCoin());
     }
+
+    public function __clone()
+    {
+        $this->coin = clone $this->coin;
+    }
 }

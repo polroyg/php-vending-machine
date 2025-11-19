@@ -27,7 +27,7 @@ class CustomerService
         $this->vendingMachine->addCoinToTransaction($coin);
     }
 
-    public function buyItem(string $itemKey, int $quantity = 1): Item
+    public function buyItem(string $itemKey, int $quantity = 1): array
     {
         return $this->vendingMachine->buyItem($itemKey, $quantity);
     }
