@@ -104,10 +104,10 @@ class Application
 
     private function processCustomerActions(): void
     {
-        if ($this->vendingMachine->getCurrentTransaction() === null) {
-            $this->vendingMachine->startTransaction();
-        }
         do {
+            if ($this->vendingMachine->getCurrentTransaction() === null) {
+                $this->vendingMachine->startTransaction();
+            }
             $action = $this->getNextCustomerAction();
             switch ($action) {
                 case 1:
@@ -261,5 +261,6 @@ class Application
         if ($this->vendingMachine->getCurrentTransaction() !== null) {
             $this->handleCloseCurrentTransaction();
         }
+        print_r("Exiting application..." . PHP_EOL);
     }
 }
