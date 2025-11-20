@@ -5,7 +5,7 @@ namespace Tests\Domain;
 use App\Domain\Coin;
 use PHPUnit\Framework\TestCase;
 
-class CointTest extends TestCase
+class CoinTest extends TestCase
 {
     public function testInvalidCoin()
     {

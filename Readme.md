@@ -9,7 +9,8 @@ Modelado de una máquina expendedora, manteniendo el estado durante su ejecució
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Arquitectura](#arquitectura-domain-driven-design-ddd)
-- [Tareas pendientes](#tareas-pendientes)
+- [Extras](#extras)
+- [Despliegue con docker](#despliegue-con-docker)
 
 # Prerequisitos
 - VSCode
@@ -19,8 +20,8 @@ Modelado de una máquina expendedora, manteniendo el estado durante su ejecució
 ## Desarrollo con VS Code
 1. Clonar el repositorio
 2. Abre la carpeta en VSCode.
-3. Arrancar el devcontainer.
-4. ejecutar el script app.php que hay dentro del src
+3. Inicia el entorno de desarrollo (devcontainer).
+4. Ejecutar el script app.php ubicado en la carpeta `src`
 
 ## Project Structure
 
@@ -84,24 +85,6 @@ Modelado de una máquina expendedora, manteniendo el estado durante su ejecució
 ```
 
 
-
-## Arquitectura: Domain-Driven Design (DDD)
-
-Este proyecto utiliza el enfoque de Domain-Driven Design (DDD) para organizar el código.
-
-**Motivo:** DDD permite separar claramente la lógica de negocio (Dominio) de la infraestructura y la aplicación, facilitando la mantenibilidad, escalabilidad y comprensión del sistema. Así, cada parte del código tiene una responsabilidad bien definida y el modelo de dominio refleja fielmente las reglas y procesos del negocio de la máquina expendedora.
-
-
-## Tareas pendientes
-
-- [ ] Añadir tests para los servicios y la capa de infraestructura
-- [ ] Crear interfaz de repositorio
-- [ ] Crear excepciones propias y mejorar la gestión de errores
-- [ ] Revisar y refactorizar algunos métodos
-- [ ] Refactorizar código repetido
-- [ ] Refactorizar command.php
-
-
 ## Getting Started
 ### Modo comando de terminal
 En modo terminal se debe ejecutar, dentro de la carpeta `src` el comando:
@@ -135,12 +118,34 @@ Las acciones disponibles para casos de uso siempre terminan con la acción `SERV
 `./command.php SERVICE`
 Esta última opción muestra el cambio y el stock
 
-## Modo interactivo en terminal
-Para arrancar el modo interactivo del terminal debes executar el comando
+### Modo interactivo en terminal
+Para arrancar el modo interactivo del terminal debes ejecutar el comando
 ```bash
 ./app.php
 ```
-dentro de la carpeta `src` y ya puedes interactuar con la aplicación a traves de los menús y opciones que muestra la consola.
+dentro de la carpeta `src` y podrás interactuar con la aplicación a través de los menús y opciones que muestra la consola.
+
+## Arquitectura: Domain-Driven Design (DDD)
+
+Este proyecto utiliza el enfoque de Domain-Driven Design (DDD) para organizar el código.
+
+**Motivo:** DDD permite separar claramente la lógica de negocio (Dominio) de la infraestructura y la aplicación, facilitando la mantenibilidad, escalabilidad y comprensión del sistema. Así, cada parte del código tiene una responsabilidad bien definida y el modelo de dominio refleja fielmente las reglas y procesos del negocio de la máquina expendedora.
 
 
+## Despliegue con docker
+Utilizando el Dockerfile que hay en la raíz, se puede desplegar directamente con docker y ejecutar los comandos anteriores para utilizar la aplicación.
+Los pasos a seguir son:
+**Construir la imagen**
+`docker build -t vending-php .` ejecutar en la raíz del proyecto
 
+**Iniciar el contenedor con un shell interactivo**
+`docker run --rm -it -v "$PWD":/app -w /app/src vending-php bash`
+
+## Próximos pasos
+
+- [ ] Añadir tests para los servicios y la capa de infraestructura
+- [ ] Crear interfaz de repositorio
+- [ ] Crear excepciones propias y mejorar la gestión de errores
+- [ ] Revisar y refactorizar algunos métodos
+- [ ] Refactorizar código repetido
+- [x] Refactorizar command.php

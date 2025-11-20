@@ -11,7 +11,7 @@ use App\Domain\VendingMachine;
 use App\Infrastructure\Repositories\ItemJsonRepository;
 use App\Infrastructure\Repositories\CashBoxItemJsonRepository;
 
-class VendorMachineTest extends TestCase
+class VendingMachineTest extends TestCase
 {
     private $itemRepository;
     private $cashBoxRepository;
