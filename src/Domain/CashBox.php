@@ -65,7 +65,7 @@ class CashBox
             return $b->getCoin()->getValue() <=> $a->getCoin()->getValue();
         });
         $cashBoxItemsShadow = array_map(fn($item) => clone $item, $this->cashBoxItems);
-        $returnCoins = $this->calculateReturnCoins($amount * 100, $cashBoxItemsShadow);
+        $returnCoins = $this->calculateReturnCoins((int)($amount * 100), $cashBoxItemsShadow);
 
         if ($amount < 0 && $returnCoins === null) {
             throw new \Exception("Not enough change available");
@@ -89,10 +89,14 @@ class CashBox
     {
         $cashBoxItemsShadow = array_map(fn($item) => clone $item, $this->cashBoxItems);
         $availableCashBoxItems = $this->addCoinsHelper($addedCoins, $cashBoxItemsShadow);
+
         usort($availableCashBoxItems, function (CashBoxItem $a, CashBoxItem $b) {
             return $b->getCoin()->getValue() <=> $a->getCoin()->getValue();
         });
-        $returnCoins = $this->calculateReturnCoins($amount * 100, $availableCashBoxItems);
+
+
+        $returnCoins = $this->calculateReturnCoins((int)($amount * 100), $availableCashBoxItems);
+
         return $returnCoins !== null;
     }
 
@@ -116,10 +120,31 @@ class CashBox
         array $returnCoins = [],
         int $depth = 0
     ): ?array {
+
+        if ($depth == 0) {
+            $sumAvailable = array_reduce(
+                $cashBoxItems,
+                fn($sum, CashBoxItem $item) => $sum + $item->getTotalAmount(),
+                0
+            );
+            if ((int)($sumAvailable * 100) < $amount) {
+                return null;
+            } elseif ((int)($sumAvailable * 100) === $amount) {
+                //get all moneys
+                return array_merge(...array_map(
+                    function ($item) {
+                        return array_fill(0, $item->getQuantity(), $item->getCoin());
+                    },
+                    $cashBoxItems
+                ));
+            }
+        }
+
         if ($amount == 0) {
             return $returnCoins;
         }
-        if ($amount < 0 || $depth > 100) {
+
+        if ($amount < 0 || $depth > 10) {
             return null; //TODO: ideal una excepción personalizada
         }
 

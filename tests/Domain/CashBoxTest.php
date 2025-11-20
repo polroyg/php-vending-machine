@@ -33,11 +33,11 @@ class CashBoxTest extends TestCase
         $this->assertEquals($initialTotal, $currentTotalAfterTake);
     }
 
-    public function testCheckChangeAvalilable()
+    public function testCheckChangeAvailable()
     {
         $cashBox = $this->initCashBox();
         $this->assertTrue($cashBox->checkChangeAvailable(0.30, [new Coin(0.10)]));
-        $this->assertFalse($cashBox->checkChangeAvailable(5.40, []));
+        $this->assertFalse($cashBox->checkChangeAvailable(6, []));
     }
 
     public function testReturnChange()
@@ -46,6 +46,18 @@ class CashBoxTest extends TestCase
         $returnCoins = $cashBox->calculateChange(0.30);
 
         $expectedReturn = [new Coin(0.25), new Coin(0.05)];
+        $this->assertIsArray($returnCoins);
+        $this->assertEquals($expectedReturn, $returnCoins);
+    }
+
+    public function testReturnChangeExact()
+    {
+        $cashBoxItem1 = new CashBoxItem(new Coin(1), 3);
+        $cashBoxItem2 = new CashBoxItem(new Coin(0.10), 2);
+        $cashBox = new CashBox([$cashBoxItem1, $cashBoxItem2]);
+        $returnCoins = $cashBox->calculateChange(3.20);
+
+        $expectedReturn = [new Coin(1), new Coin(1), new Coin(1), new Coin(0.10), new Coin(0.10)];
         $this->assertIsArray($returnCoins);
         $this->assertEquals($expectedReturn, $returnCoins);
     }
