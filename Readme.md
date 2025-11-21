@@ -103,8 +103,11 @@ Las acciones disponibles para casos de uso de cliente son:
 
 Antes de la acción se espera las monedas a introducir en la máquina.
 `./command.php "1, 0.25, 0.25, GET-SODA"`
+
 `./command.php "1, 0.25, 0.25, RETURN-COIN"`
+
 `./command.php 1 0.25 0.25 GET-SODA`
+
 `./command.php 1 0.25 0.25 RETURN-COIN`
 
 Las acciones disponibles para casos de uso siempre terminan con la acción `SERVICE` y se le puede pasar un argumento más al principio, indicando lo que queremos ver:
